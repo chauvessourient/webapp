@@ -37,11 +37,13 @@ services:
        - POSTGRES_USER=marketplace
        - POSTGRES_PASSWORD=marketplacepwd
   api:
-    build: .
+    image: ludovicbouguerra/marketplace
     command: prod-webservice
     environment:
       - VIRTUAL_HOST=www.matchable.fr
-      - CERT_NAME=www.matchable.fr
+      - VIRTUAL_PROTO=uwsgi
+      - LETSENCRYPT_HOST=www.matchable.fr
+      - LETSENCRYPT_EMAIL=bouguerra.ludovic@gmail.com
       - MARKETPLACE_SECRET_KEY=+!u6s@e[o|8"HYxOsysu_zaB@#qv!:5-dde[{)D2I8F^o)^GnDR/2uecja#co
       - MARKETPLACE_ALLOWED_HOSTS=www.matchable.fr
       - MARKETPLACE_DB_ENGINE=postgresql
@@ -52,3 +54,9 @@ services:
       - MARKETPLACE_DB_PORT=5432
     depends_on:
       - db
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
