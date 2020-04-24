@@ -9,13 +9,11 @@ services:
        - POSTGRES_PASSWORD=marketplacepwd
   api:
     build: .
-    command: prod-webservice
+    command: dev-webservice
     environment:
       - MARKETPLACE_DEBUG=1
-      - VIRTUAL_HOST=api.maketplace.local
-      - CERT_NAME=api.maketplace.local
       - MARKETPLACE_SECRET_KEY=+!u6s@e[o|8"HYxOsysu_zaB@#qv!:5-dde[{)D2I8F^o)^GnDR/2uecja#co
-      - MARKETPLACE_ALLOWED_HOSTS=api.maketplace.local
+      - MARKETPLACE_ALLOWED_HOSTS=localhost
       - MARKETPLACE_DB_ENGINE=postgresql
       - MARKETPLACE_DB_HOST=db
       - MARKETPLACE_DB_NAME=marketplace
