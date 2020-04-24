@@ -1,6 +1,35 @@
 version: '3'
     
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+        - "80:80"
+        - "443:443"
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro      
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+    environment: 
+      - DHPARAM_GENERATION=false
+      - HTTPS_METHOD=nohttp      
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-le
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - vhost:/etc/nginx/vhost.d:rw      
+      - html:/usr/share/nginx/html:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
   db:
     image: postgres
     environment:
@@ -11,20 +40,15 @@ services:
     build: .
     command: prod-webservice
     environment:
-      - MARKETPLACE_DEBUG=1
-      - VIRTUAL_HOST=api.maketplace.local
-      - CERT_NAME=api.maketplace.local
+      - VIRTUAL_HOST=www.matchable.fr
+      - CERT_NAME=www.matchable.fr
       - MARKETPLACE_SECRET_KEY=+!u6s@e[o|8"HYxOsysu_zaB@#qv!:5-dde[{)D2I8F^o)^GnDR/2uecja#co
-      - MARKETPLACE_ALLOWED_HOSTS=api.maketplace.local
+      - MARKETPLACE_ALLOWED_HOSTS=www.matchable.fr
       - MARKETPLACE_DB_ENGINE=postgresql
       - MARKETPLACE_DB_HOST=db
       - MARKETPLACE_DB_NAME=marketplace
       - MARKETPLACE_DB_USER=marketplace
       - MARKETPLACE_DB_PASSWORD=marketplacepwd
       - MARKETPLACE_DB_PORT=5432
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
     depends_on:
       - db
